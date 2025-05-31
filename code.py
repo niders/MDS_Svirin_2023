@@ -297,3 +297,25 @@ for priority in [1, 3, 5]:
     plt.title(f'WordCloud для очереди {priority}')
     plt.axis('off')
     plt.show()
+
+
+errors = X_test[y_test != y_pred]
+vectorizer = TfidfVectorizer(ngram_range=(2,2), max_features=5)
+error_ngrams = vectorizer.fit_transform(errors)
+
+plt.figure(figsize=(12,8))
+sns.barplot(x=error_ngrams.sum(axis=0).A1, 
+            y=vectorizer.get_feature_names_out())
+plt.title('Топ-5 биграмм в ошибочно классифицированных платежах')
+plt.show()
+
+
+metrics = classification_report(y_test, y_pred, output_dict=True)
+df_metrics = pd.DataFrame(metrics).transpose().drop(['accuracy', 'macro avg', 'weighted avg'])
+
+df_metrics[['precision', 'recall', 'f1-score']].plot(kind='bar', figsize=(10,6))
+plt.title('Сравнение метрик по классам')
+plt.xticks(rotation=0)
+plt.ylabel('Значение метрики')
+plt.grid(axis='y')
+plt.show()
